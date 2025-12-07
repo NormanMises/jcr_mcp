@@ -2,6 +2,13 @@
 
 基于ShowJCR仓库数据的Model Context Protocol (MCP) 服务器，为大语言模型提供最新的期刊分区表查询功能。
 
+[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+> 💡 **新版本**: 现已支持通过 `uvx` 一键部署！无需手动安装依赖，开箱即用。
+>
+> 📖 **升级指南**: 如果你是从旧版本升级，请查看 [MIGRATION_GUIDE.md](MIGRATION_GUIDE.md)
+
 ## 功能特性
 
 ### 🔧 工具 (Tools)
