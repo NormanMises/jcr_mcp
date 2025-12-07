@@ -28,9 +28,12 @@ RUN mkdir -p /root/.jcr_mcp
 # 暴露端口
 EXPOSE 8080
 
+# 复制健康检查脚本
+COPY healthcheck.py .
+
 # 健康检查
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD python -c "import sqlite3; conn = sqlite3.connect('/root/.jcr_mcp/jcr.db'); conn.close()" || exit 1
+    CMD python healthcheck.py || exit 1
 
 # 启动命令
 CMD ["jcr-mcp-server", "sse"]

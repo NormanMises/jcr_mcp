@@ -7,7 +7,11 @@
 
 > 💡 **新版本**: 现已支持通过 `uvx` 一键部署！无需手动安装依赖，开箱即用。
 >
+> 🚀 **快速开始**: 查看 [QUICKSTART.md](QUICKSTART.md) 快速部署指南
+>
 > 📖 **升级指南**: 如果你是从旧版本升级，请查看 [MIGRATION_GUIDE.md](MIGRATION_GUIDE.md)
+>
+> 🌐 **托管部署**: 支持作为远程服务部署，详见 [DEPLOYMENT.md](DEPLOYMENT.md)
 
 ## 功能特性
 
@@ -19,6 +23,7 @@
 
 ### 📋 资源 (Resources)
 - **jcr://database-info** - 数据库基本信息和统计
+- **jcr://health** - 健康检查端点（用于监控）
 
 ### 💡 提示词 (Prompts)
 - **journal_analysis_prompt** - 期刊分析专用提示词模板

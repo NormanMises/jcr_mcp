@@ -15,7 +15,7 @@ services:
       - jcr-data:/root/.jcr_mcp
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "python", "-c", "import sqlite3; conn = sqlite3.connect('/root/.jcr_mcp/jcr.db'); conn.close()"]
+      test: ["CMD", "python", "healthcheck.py"]
       interval: 30s
       timeout: 3s
       retries: 3
