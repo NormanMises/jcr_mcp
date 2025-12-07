@@ -51,3 +51,10 @@ data_sync.log
 
 # Distribution / packaging
 *.whl
+
+# Environment variables
+.env
+.env.local
+
+# Docker
+docker-compose.override.yml

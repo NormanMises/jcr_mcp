@@ -300,11 +300,71 @@ Cell                      64.5           Q1             正常
 
 这样可以确保数据在不同运行环境下都能保持一致，且不会被意外删除。
 
-### 部署到云端
-可以将服务器部署到云平台，支持HTTP传输：
-```python
-app.run(transport="streamable-http", host="0.0.0.0", port=8080)
+## 托管部署（远程服务）
+
+本项目支持作为远程服务部署，可以通过 HTTP/SSE 协议访问。详细部署指南请参考 [DEPLOYMENT.md](DEPLOYMENT.md)。
+
+### 快速开始
+
+#### Docker 部署（推荐）
+```bash
+# 克隆仓库
+git clone https://github.com/NormanMises/jcr_mcp.git
+cd jcr_mcp
+
+# 使用 Docker Compose 启动
+docker-compose up -d
+
+# 服务将在 http://localhost:8080 运行
 ```
+
+#### 直接部署
+```bash
+# 安装并同步数据
+pip install -e .
+jcr-mcp-sync
+
+# 启动 SSE 服务器
+jcr-mcp-server sse
+
+# 或使用环境变量配置
+JCR_MCP_HOST=0.0.0.0 JCR_MCP_PORT=8080 jcr-mcp-server sse
+```
+
+### 环境变量配置
+
+| 变量名 | 说明 | 默认值 |
+|--------|------|--------|
+| `JCR_MCP_TRANSPORT` | 传输协议：stdio/sse/streamable-http | `stdio` |
+| `JCR_MCP_HOST` | 监听地址 | `0.0.0.0` |
+| `JCR_MCP_PORT` | 监听端口 | `8080` |
+
+### 支持的部署平台
+
+- ✅ Docker / Docker Compose
+- ✅ Railway
+- ✅ Fly.io
+- ✅ Heroku
+- ✅ 阿里云/腾讯云/AWS ECS
+- ✅ 任何支持 Python 的云平台
+
+### 客户端连接
+
+远程服务可通过 HTTP/SSE 协议连接：
+
+```python
+from mcp import ClientSession
+from mcp.client.sse import sse_client
+
+async with sse_client("http://your-server:8080") as (read, write):
+    async with ClientSession(read, write) as session:
+        await session.initialize()
+        result = await session.call_tool("search_journal", {
+            "journal_name": "Nature"
+        })
+```
+
+完整的部署指南、云平台配置、监控维护等信息，请查看 [DEPLOYMENT.md](DEPLOYMENT.md)。
 
 ## 相关链接
 
