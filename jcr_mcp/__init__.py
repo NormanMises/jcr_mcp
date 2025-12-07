@@ -10,5 +10,12 @@ __author__ = "JCR MCP Contributors"
 __license__ = "MIT"
 
 from .database import JCRDatabase, JournalInfo
+from .config import get_data_dir, get_database_path
 
-__all__ = ["JCRDatabase", "JournalInfo", "__version__"]
+__all__ = [
+    "JCRDatabase", 
+    "JournalInfo", 
+    "get_data_dir",
+    "get_database_path",
+    "__version__"
+]

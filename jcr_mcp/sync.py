@@ -14,22 +14,30 @@ import logging
 from typing import Dict, List, Optional
 from datetime import datetime
 
+from .config import get_database_path, get_data_dir
+
 
 # 配置日志
 def setup_logger():
     """设置日志记录器"""
-    log_dir = Path.home() / ".jcr_mcp"
-    log_dir.mkdir(exist_ok=True)
+    log_dir = get_data_dir()
     
-    logging.basicConfig(
-        level=logging.INFO,
-        format='%(asctime)s - %(levelname)s - %(message)s',
-        handlers=[
-            logging.FileHandler(log_dir / 'data_sync.log'),
-            logging.StreamHandler()
-        ]
-    )
-    return logging.getLogger(__name__)
+    logger = logging.getLogger(__name__)
+    logger.setLevel(logging.INFO)
+    
+    # 避免重复添加处理器
+    if not logger.handlers:
+        # 文件处理器
+        file_handler = logging.FileHandler(log_dir / 'data_sync.log')
+        file_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
+        logger.addHandler(file_handler)
+        
+        # 控制台处理器
+        console_handler = logging.StreamHandler()
+        console_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
+        logger.addHandler(console_handler)
+    
+    return logger
 
 
 logger = setup_logger()
@@ -46,9 +54,7 @@ class DataSyncer:
             db_path: 数据库文件路径，如果为None则使用默认路径
         """
         if db_path is None:
-            data_dir = Path.home() / ".jcr_mcp"
-            data_dir.mkdir(exist_ok=True)
-            db_path = str(data_dir / "jcr.db")
+            db_path = get_database_path()
         
         self.db_path = db_path
         self.base_url = "https://raw.githubusercontent.com/hitfyd/ShowJCR/master/"
@@ -186,7 +192,7 @@ class DataSyncer:
         self.create_database_tables()
         
         # 创建临时下载目录
-        download_dir = Path.home() / ".jcr_mcp" / "temp_data"
+        download_dir = get_data_dir() / "temp_data"
         download_dir.mkdir(parents=True, exist_ok=True)
         
         logger.info("开始同步JCR分区表数据...")
@@ -221,7 +227,8 @@ class DataSyncer:
         if download_dir.exists():
             try:
                 download_dir.rmdir()
-            except:
+            except OSError:
+                # 目录不为空或其他IO错误时忽略
                 pass
         
         return results

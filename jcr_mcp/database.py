@@ -5,7 +5,8 @@ import sqlite3
 import os
 from typing import Optional, Dict, List
 from dataclasses import dataclass
-from pathlib import Path
+
+from .config import get_database_path
 
 
 @dataclass
@@ -31,10 +32,7 @@ class JCRDatabase:
             db_path: 数据库文件路径，如果为None则使用默认路径
         """
         if db_path is None:
-            # 使用用户主目录下的数据目录
-            data_dir = Path.home() / ".jcr_mcp"
-            data_dir.mkdir(exist_ok=True)
-            db_path = str(data_dir / "jcr.db")
+            db_path = get_database_path()
         
         self.db_path = db_path
         self.init_database()

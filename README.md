@@ -34,7 +34,7 @@
 
 #### 1. 首次使用需要同步数据
 ```bash
-uvx jcr-mcp-server@git+https://github.com/NormanMises/jcr_mcp.git --from jcr-mcp-sync
+uvx --from jcr-mcp-server@git+https://github.com/NormanMises/jcr_mcp.git jcr-mcp-sync
 ```
 
 选择"1"同步所有数据，等待下载和导入完成。
