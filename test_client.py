@@ -9,11 +9,27 @@ from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
 
 # 服务器参数配置
+# 可以使用以下任一方式启动服务器：
+# 1. 使用已安装的命令（推荐）
 server_params = StdioServerParameters(
-    command="python",
-    args=["jcr_mcp_server.py"],
+    command="jcr-mcp-server",
+    args=[],
     env=None,
 )
+
+# 2. 或者使用 python -m 方式
+# server_params = StdioServerParameters(
+#     command="python",
+#     args=["-m", "jcr_mcp"],
+#     env=None,
+# )
+
+# 3. 或者使用原始脚本方式（向后兼容）
+# server_params = StdioServerParameters(
+#     command="python",
+#     args=["jcr_mcp_server.py"],
+#     env=None,
+# )
 
 async def test_mcp_server():
     """测试MCP服务器的各项功能"""

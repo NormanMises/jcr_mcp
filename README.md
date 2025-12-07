@@ -109,6 +109,32 @@ python data_sync.py
 python jcr_mcp_server.py
 ```
 
+## 快速测试
+
+安装后，可以快速验证安装是否成功：
+
+### 1. 测试服务器启动
+```bash
+# 使用 uvx
+uvx jcr-mcp-server@git+https://github.com/NormanMises/jcr_mcp.git
+
+# 或使用已安装的命令
+jcr-mcp-server
+
+# 或使用 python -m
+python -m jcr_mcp
+```
+
+看到启动信息即表示安装成功，按 `Ctrl+C` 停止服务器。
+
+### 2. 测试数据同步
+```bash
+# 使用已安装的命令
+jcr-mcp-sync
+
+# 选择"4"退出测试界面
+```
+
 ## 客户端测试
 
 ### 独立测试
@@ -234,11 +260,13 @@ Cell                      64.5           Q1             正常
 - SQLite数据库存储所有分区表数据
 - 支持多个年份的历史数据
 - 自动数据同步和验证机制
+- 数据存储在用户目录 `~/.jcr_mcp/` 下，确保持久性
 
 ### 服务层  
 - FastMCP框架构建MCP服务器
 - 异步处理提高性能
 - 完善的错误处理和日志记录
+- 支持多种运行方式（uvx、pip install、直接运行）
 
 ### 接口层
 - 标准MCP协议接口
