@@ -28,24 +28,83 @@
 
 ## 安装部署
 
-### 1. 环境要求
-- Python 3.8+
-- SQLite3
+### 方法一：使用 uvx 部署（推荐）
 
-### 2. 安装依赖
-```bash
-pip install -r requirements.txt
-```
+`uvx` 是一个快速、可靠的 Python 应用运行工具，无需手动安装依赖。
 
-### 3. 数据同步
-首次运行前需要同步数据：
+#### 1. 首次使用需要同步数据
 ```bash
-python data_sync.py
+uvx jcr-mcp-server@git+https://github.com/NormanMises/jcr_mcp.git --from jcr-mcp-sync
 ```
 
 选择"1"同步所有数据，等待下载和导入完成。
 
-### 4. 启动服务器
+#### 2. 启动服务器
+```bash
+uvx jcr-mcp-server@git+https://github.com/NormanMises/jcr_mcp.git
+```
+
+或者直接使用包名（如果已发布到 PyPI）：
+```bash
+uvx jcr-mcp-server
+```
+
+#### 3. 在 Claude Desktop 中配置
+编辑 Claude Desktop 配置文件，添加：
+```json
+{
+  "mcpServers": {
+    "jcr-partition": {
+      "command": "uvx",
+      "args": ["jcr-mcp-server@git+https://github.com/NormanMises/jcr_mcp.git"],
+      "env": {}
+    }
+  }
+}
+```
+
+### 方法二：从源码安装
+
+#### 1. 克隆仓库
+```bash
+git clone https://github.com/NormanMises/jcr_mcp.git
+cd jcr_mcp
+```
+
+#### 2. 安装包
+```bash
+pip install -e .
+```
+
+#### 3. 数据同步
+```bash
+jcr-mcp-sync
+```
+
+选择"1"同步所有数据，等待下载和导入完成。
+
+#### 4. 启动服务器
+```bash
+jcr-mcp-server
+```
+
+### 方法三：传统方式（兼容旧版本）
+
+#### 1. 环境要求
+- Python 3.8+
+- SQLite3
+
+#### 2. 安装依赖
+```bash
+pip install -r requirements.txt
+```
+
+#### 3. 数据同步
+```bash
+python data_sync.py
+```
+
+#### 4. 启动服务器
 ```bash
 python jcr_mcp_server.py
 ```
@@ -63,7 +122,34 @@ python test_client.py
 
 ### Claude Desktop集成
 
+#### 使用 uvx（推荐）
 在Claude Desktop配置文件中添加：
+```json
+{
+  "mcpServers": {
+    "jcr-partition": {
+      "command": "uvx",
+      "args": ["jcr-mcp-server@git+https://github.com/NormanMises/jcr_mcp.git"],
+      "env": {}
+    }
+  }
+}
+```
+
+#### 使用已安装的包
+```json
+{
+  "mcpServers": {
+    "jcr-partition": {
+      "command": "jcr-mcp-server",
+      "args": [],
+      "env": {}
+    }
+  }
+}
+```
+
+#### 使用 Python 脚本（传统方式）
 ```json
 {
   "mcpServers": {
