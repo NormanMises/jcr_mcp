@@ -334,12 +334,11 @@ async def health_check() -> str:
     """健康检查端点"""
     try:
         database = get_db()
-        # 简单检查数据库是否可访问
-        conn = sqlite3.connect(database.db_path)
-        cursor = conn.cursor()
-        cursor.execute("SELECT name FROM sqlite_master WHERE type='table' LIMIT 1")
-        cursor.fetchone()
-        conn.close()
+        # 简单检查数据库是否可访问，使用 context manager
+        with sqlite3.connect(database.db_path) as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT name FROM sqlite_master WHERE type='table' LIMIT 1")
+            cursor.fetchone()
         
         return "OK"
     except Exception as e:

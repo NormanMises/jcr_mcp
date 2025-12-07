@@ -33,7 +33,7 @@ COPY healthcheck.py .
 
 # 健康检查
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD python healthcheck.py || exit 1
+    CMD python3 healthcheck.py || exit 1
 
 # 启动命令
 CMD ["jcr-mcp-server", "sse"]

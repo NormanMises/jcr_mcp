@@ -9,7 +9,18 @@ from pathlib import Path
 
 
 def check_database():
-    """检查数据库是否可访问"""
+    """
+    检查数据库是否可访问
+    
+    健康检查策略:
+    - 如果数据库文件不存在: 失败
+    - 如果数据库无法访问: 失败  
+    - 如果数据库可访问但无表: 成功（视为首次启动未同步数据）
+    - 如果数据库包含数据表: 成功
+    
+    Returns:
+        bool: 健康检查是否通过
+    """
     try:
         # 获取数据库路径
         db_path = Path.home() / ".jcr_mcp" / "jcr.db"
@@ -18,24 +29,22 @@ def check_database():
             print(f"❌ 数据库文件不存在: {db_path}")
             return False
         
-        # 尝试连接数据库
-        conn = sqlite3.connect(str(db_path))
-        cursor = conn.cursor()
-        
-        # 执行简单查询
-        cursor.execute("SELECT name FROM sqlite_master WHERE type='table' LIMIT 1")
-        result = cursor.fetchone()
-        
-        conn.close()
-        
-        if result:
-            print(f"✅ 数据库健康检查通过 (包含数据表)")
-            return True
-        else:
-            # 数据库存在但无表，可能是首次启动未同步数据
-            print(f"⚠️ 数据库无数据表 (可能需要运行 jcr-mcp-sync)")
-            # 仍然返回True，因为数据库本身可访问
-            return True
+        # 尝试连接数据库，使用 context manager 确保正确关闭
+        with sqlite3.connect(str(db_path)) as conn:
+            cursor = conn.cursor()
+            
+            # 执行简单查询
+            cursor.execute("SELECT name FROM sqlite_master WHERE type='table' LIMIT 1")
+            result = cursor.fetchone()
+            
+            if result:
+                print(f"✅ 数据库健康检查通过 (包含数据表)")
+                return True
+            else:
+                # 数据库存在但无表，可能是首次启动未同步数据
+                print(f"⚠️ 数据库无数据表 (可能需要运行 jcr-mcp-sync)")
+                # 仍然返回True，因为数据库本身可访问
+                return True
             
     except Exception as e:
         print(f"❌ 数据库健康检查失败: {e}")
