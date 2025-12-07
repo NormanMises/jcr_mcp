@@ -1,0 +1,50 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "jcr-mcp-server"
+version = "0.1.0"
+description = "JCR分区表MCP服务器 - 为大语言模型提供期刊分区表查询功能"
+readme = "README.md"
+requires-python = ">=3.8"
+license = { text = "MIT" }
+authors = [
+    { name = "JCR MCP Contributors" }
+]
+keywords = ["mcp", "jcr", "journal", "partition", "server"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+
+dependencies = [
+    "mcp>=1.0.0",
+    "httpx>=0.25.0",
+    "pandas>=1.5.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
+]
+
+[project.scripts]
+jcr-mcp-server = "jcr_mcp.server:main"
+jcr-mcp-sync = "jcr_mcp.sync:main"
+
+[project.urls]
+Homepage = "https://github.com/NormanMises/jcr_mcp"
+Repository = "https://github.com/NormanMises/jcr_mcp"
+Issues = "https://github.com/NormanMises/jcr_mcp/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["jcr_mcp"]

@@ -1,10 +1,9 @@
 {
   "mcpServers": {
     "jcr-partition": {
-      "command": "python",
-      "args": ["jcr_mcp_server.py"],
-      "cwd": "/path/to/your/jcr-mcp-server",
+      "command": "uvx",
+      "args": ["jcr-mcp-server@git+https://github.com/NormanMises/jcr_mcp.git"],
       "env": {}
     }
   }
-} 
+}

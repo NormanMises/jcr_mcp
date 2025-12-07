@@ -2,6 +2,13 @@
 
 基于ShowJCR仓库数据的Model Context Protocol (MCP) 服务器，为大语言模型提供最新的期刊分区表查询功能。
 
+[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+> 💡 **新版本**: 现已支持通过 `uvx` 一键部署！无需手动安装依赖，开箱即用。
+>
+> 📖 **升级指南**: 如果你是从旧版本升级，请查看 [MIGRATION_GUIDE.md](MIGRATION_GUIDE.md)
+
 ## 功能特性
 
 ### 🔧 工具 (Tools)
@@ -28,26 +35,111 @@
 
 ## 安装部署
 
-### 1. 环境要求
-- Python 3.8+
-- SQLite3
+### 方法一：使用 uvx 部署（推荐）
 
-### 2. 安装依赖
-```bash
-pip install -r requirements.txt
-```
+`uvx` 是一个快速、可靠的 Python 应用运行工具，无需手动安装依赖。
 
-### 3. 数据同步
-首次运行前需要同步数据：
+#### 1. 首次使用需要同步数据
 ```bash
-python data_sync.py
+uvx --from jcr-mcp-server@git+https://github.com/NormanMises/jcr_mcp.git jcr-mcp-sync
 ```
 
 选择"1"同步所有数据，等待下载和导入完成。
 
-### 4. 启动服务器
+#### 2. 启动服务器
+```bash
+uvx jcr-mcp-server@git+https://github.com/NormanMises/jcr_mcp.git
+```
+
+或者直接使用包名（如果已发布到 PyPI）：
+```bash
+uvx jcr-mcp-server
+```
+
+#### 3. 在 Claude Desktop 中配置
+编辑 Claude Desktop 配置文件，添加：
+```json
+{
+  "mcpServers": {
+    "jcr-partition": {
+      "command": "uvx",
+      "args": ["jcr-mcp-server@git+https://github.com/NormanMises/jcr_mcp.git"],
+      "env": {}
+    }
+  }
+}
+```
+
+### 方法二：从源码安装
+
+#### 1. 克隆仓库
+```bash
+git clone https://github.com/NormanMises/jcr_mcp.git
+cd jcr_mcp
+```
+
+#### 2. 安装包
+```bash
+pip install -e .
+```
+
+#### 3. 数据同步
+```bash
+jcr-mcp-sync
+```
+
+选择"1"同步所有数据，等待下载和导入完成。
+
+#### 4. 启动服务器
+```bash
+jcr-mcp-server
+```
+
+### 方法三：传统方式（兼容旧版本）
+
+#### 1. 环境要求
+- Python 3.8+
+- SQLite3
+
+#### 2. 安装依赖
+```bash
+pip install -r requirements.txt
+```
+
+#### 3. 数据同步
+```bash
+python data_sync.py
+```
+
+#### 4. 启动服务器
 ```bash
 python jcr_mcp_server.py
+```
+
+## 快速测试
+
+安装后，可以快速验证安装是否成功：
+
+### 1. 测试服务器启动
+```bash
+# 使用 uvx
+uvx jcr-mcp-server@git+https://github.com/NormanMises/jcr_mcp.git
+
+# 或使用已安装的命令
+jcr-mcp-server
+
+# 或使用 python -m
+python -m jcr_mcp
+```
+
+看到启动信息即表示安装成功，按 `Ctrl+C` 停止服务器。
+
+### 2. 测试数据同步
+```bash
+# 使用已安装的命令
+jcr-mcp-sync
+
+# 选择"4"退出测试界面
 ```
 
 ## 客户端测试
@@ -63,7 +155,34 @@ python test_client.py
 
 ### Claude Desktop集成
 
+#### 使用 uvx（推荐）
 在Claude Desktop配置文件中添加：
+```json
+{
+  "mcpServers": {
+    "jcr-partition": {
+      "command": "uvx",
+      "args": ["jcr-mcp-server@git+https://github.com/NormanMises/jcr_mcp.git"],
+      "env": {}
+    }
+  }
+}
+```
+
+#### 使用已安装的包
+```json
+{
+  "mcpServers": {
+    "jcr-partition": {
+      "command": "jcr-mcp-server",
+      "args": [],
+      "env": {}
+    }
+  }
+}
+```
+
+#### 使用 Python 脚本（传统方式）
 ```json
 {
   "mcpServers": {
@@ -148,11 +267,13 @@ Cell                      64.5           Q1             正常
 - SQLite数据库存储所有分区表数据
 - 支持多个年份的历史数据
 - 自动数据同步和验证机制
+- 数据存储在用户目录 `~/.jcr_mcp/` 下，确保持久性
 
 ### 服务层  
 - FastMCP框架构建MCP服务器
 - 异步处理提高性能
 - 完善的错误处理和日志记录
+- 支持多种运行方式（uvx、pip install、直接运行）
 
 ### 接口层
 - 标准MCP协议接口
@@ -170,6 +291,14 @@ Cell                      64.5           Q1             正常
 1. 在`jcr_mcp_server.py`中使用`@app.tool()`装饰器
 2. 实现具体的查询逻辑
 3. 添加合适的文档字符串
+
+### 数据存储位置
+
+使用 uvx 或已安装的包运行时，数据库会自动存储在用户主目录下：
+- Linux/Mac: `~/.jcr_mcp/jcr.db`
+- Windows: `%USERPROFILE%\.jcr_mcp\jcr.db`
+
+这样可以确保数据在不同运行环境下都能保持一致，且不会被意外删除。
 
 ### 部署到云端
 可以将服务器部署到云平台，支持HTTP传输：
