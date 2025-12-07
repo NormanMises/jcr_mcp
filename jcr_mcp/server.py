@@ -1,6 +1,7 @@
 """
 JCR分区表MCP服务器主模块
 """
+import os
 import sqlite3
 from typing import Optional
 from pathlib import Path
@@ -10,8 +11,13 @@ from mcp.server.fastmcp import FastMCP
 from .database import JCRDatabase
 
 
+# 从环境变量获取配置
+DEFAULT_HOST = os.getenv("JCR_MCP_HOST", "0.0.0.0")
+DEFAULT_PORT = int(os.getenv("JCR_MCP_PORT", "8080"))
+DEFAULT_TRANSPORT = os.getenv("JCR_MCP_TRANSPORT", "stdio")
+
 # 初始化FastMCP服务器
-app = FastMCP("jcr-partition-server", port=8080)
+app = FastMCP("jcr-partition-server", port=DEFAULT_PORT)
 
 # 全局数据库实例
 db = None
@@ -323,6 +329,22 @@ async def journal_analysis_prompt(journal_name: str) -> str:
 """
 
 
+@app.resource("jcr://health")
+async def health_check() -> str:
+    """健康检查端点"""
+    try:
+        database = get_db()
+        # 简单检查数据库是否可访问，使用 context manager
+        with sqlite3.connect(database.db_path) as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT name FROM sqlite_master WHERE type='table' LIMIT 1")
+            cursor.fetchone()
+        
+        return "OK"
+    except Exception as e:
+        return f"ERROR: {str(e)}"
+
+
 def main():
     """主函数 - 作为命令行入口点"""
     import sys
@@ -330,8 +352,19 @@ def main():
     # 初始化数据库
     database = get_db()
     
+    # 从命令行参数或环境变量获取传输方式
+    transport = DEFAULT_TRANSPORT
+    if len(sys.argv) > 1 and sys.argv[1] in ["stdio", "sse", "streamable-http"]:
+        transport = sys.argv[1]
+    
     print("🚀 启动JCR分区表MCP服务器...")
     print(f"📊 数据库路径: {database.db_path}")
+    print(f"🌐 传输方式: {transport}")
+    
+    if transport in ["sse", "streamable-http"]:
+        print(f"🔌 监听地址: {DEFAULT_HOST}:{DEFAULT_PORT}")
+        print(f"📍 访问地址: http://{DEFAULT_HOST}:{DEFAULT_PORT}")
+    
     print("🔧 可用工具:")
     print("  • search_journal - 搜索期刊信息")
     print("  • get_partition_trends - 获取分区趋势")
@@ -342,7 +375,7 @@ def main():
     print("\n⚡ 服务器启动中...")
     
     # 运行MCP服务器
-    app.run(transport="stdio")
+    app.run(transport=transport)
 
 
 if __name__ == "__main__":
